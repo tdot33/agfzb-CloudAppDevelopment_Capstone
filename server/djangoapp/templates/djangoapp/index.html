@@ -3,7 +3,7 @@
 <head>
     {% load static %}
     <meta charset="UTF-8">
-    <title>Dealership Review</title>
+    <title>{% block title %}Dealership Review{% endblock %}</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
@@ -12,16 +12,31 @@
     <script src="https://unpkg.com/bootstrap-table@1.18.2/dist/bootstrap-table.min.js"></script>
     <script src="https://unpkg.com/bootstrap-table@1.18.2/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
 </head>
-
-    <body>
-     This is the index page of your Django app!
-    <!--Add a nav bar here -->
-        <nav class="navbar navbar-light bg-light">
-            <div class="container-fluid">
+<body>
+<header>
+    {% block h1 %}
+    <h1 class="text-center mt-auto">
+    This is the index page of your Django app!
+    </h1>
+    {% endblock %}
+    <nav class="navbar navbar-light bg-light">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand font-weight-bold font-italic text-danger" href="{% url 'djangoapp:index' %}">Best Cars Dealership</a>
             </div>
-        </nav>
+            <ul class="navbar-nav ml-auto">
+                <li>
+                    <a class="btn btn-link" href="{% url 'djangoapp:about' %}">About</a>
+                    <a class="btn btn-link" href="{% url 'djangoapp:contact' %}">Contact Us</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>
+{% block content %}
+{% endblock %}
     <!--Add a dealer table here -->
 
-    </body>
+</body>
 
 </html>
