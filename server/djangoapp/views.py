@@ -86,6 +86,7 @@ def registration_request(request):
             login(request, user)
             return redirect("djangoapp:index")
         else:
+            context['message'] = "Oops! Something went wrong. Try again."
             return render(request, 'djangoapp/registration.html', context)
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
