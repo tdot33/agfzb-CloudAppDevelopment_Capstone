@@ -8,9 +8,10 @@ from requests.auth import HTTPBasicAuth
 def get_request(url, **kwargs):
     print(kwargs)
     print("GET from {} ".format(url))
+    response = None # Initialize response variable to 'None'
     try:
         response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
-        auth=HTTPBasicAuth('apikey', api_key))
+        auth=HTTPBasicAuth("k8xeG9mAmJ0Ovx-W5R5YCUoTgyEcr3oXUeA0AVyxuz6d", api_key))
     except:
         print("Network exception occurred")
     status_code = response.status_code
