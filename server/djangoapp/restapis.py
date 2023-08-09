@@ -5,13 +5,16 @@ from requests.auth import HTTPBasicAuth
 
 # Create a `get_request` to make HTTP GET requests
 
-def get_request(url, **kwargs):
+def get_request(url, params=None):
     print(kwargs)
     print("GET from {} ".format(url))
     try:
         # Call get method of requests library with URL and parameters
-        response = requests.get(url, headers={'Content-Type': 'application/json'},
-                                    params=kwargs)
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return None
     except:
         # If any error occurs
         print("Network exception occurred")
@@ -53,7 +56,7 @@ def get_dealers_from_cf(url, **kwargs):
 def get_dealer_by_id_from_cf(url, dealerId):
     results = []
     # - Call get_request() with specified arguments
-    json_result = get_request(url, dealerId=dealer_id)
+    json_result = get_request(url, dealerId=dealerId)
     if json_result:
         # Get the "documents" array from the JSON response
         dealers = json_result["documents"]
@@ -79,9 +82,11 @@ def get_dealer_by_id_from_cf(url, dealerId):
 
 def get_dealer_reviews_from_cf(url, dealerId):
     results = []
-    json_result = get_request(url, dealerId=dealerId)
+    param_dict = {"dealerId": dealerId}
+    json_result = get_request(url, params=json.dumps(param_dict))
     if json_result:
         reviews = json_result["docs"]
+        print(json_result)
         # Create DealerReview object with values from the reviews dict
         for review in reviews:
             review = DealerReview(

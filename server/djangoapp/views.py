@@ -111,7 +111,7 @@ def get_dealer_details(request, dealer_id):
         # Join all the reviewers' names
         reviewer_name = ' '.join([review.name for review in reviews])
         # Return a list of reviewers' names
-        return HttpResponse(review_name)
+        return HttpResponse(reviewer_name)
 
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
