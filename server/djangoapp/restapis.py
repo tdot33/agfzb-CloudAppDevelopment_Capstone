@@ -22,16 +22,18 @@ def get_request(url, api_key=None, params=None, **kwargs):
                 headers={'Content-Type': 'application/json'}, 
                 auth=HTTPBasicAuth('apikey', api_key),
                 **kwargs
-                )
+            )
         else:
             response = requests.get(url, params=params, headers=headers, **kwargs)
+        
+        status_code = response.status_code
+        print("With status {} ".format(status_code))
+        json_data = json.loads(response.text)
+        return json_data
     except:
         # If any error occurs
         print("Network exception occurred")
-    status_code = response.status_code
-    print("With status {} ".format(status_code))
-    json_data = json.loads(response.text)
-    return json_data
+        return None
 
 # Create a `post_request` to make HTTP POST requests
 # e.g., response = requests.post(url, params=kwargs, json=payload)
@@ -107,22 +109,22 @@ def get_dealer_reviews_from_cf(url, dealerId):
                 car_model=review["car_model"],
                 car_year=review["car_year"],
                 review=review["review"],
-                id=review["id"],
-                sentiment=analyze_review_sentiments(review["review"])          
+                id=review["id"]          
             )
+            review_obj.sentiment = analyze_review_sentiments(review_obj.review)
             results.append(review_obj)
 
     return results
 
 # Create an `analyze_review_sentiments` method to call Watson NLU and analyze text
-def analyze_review_sentiments(dealerreview):
+def analyze_review_sentiments(text, api_key=None):
     results = []
     # - Call get_request() with specified arguments
     url = "https://api.au-syd.natural-language-understanding.watson.cloud.ibm.com/instances/ecbd1545-b8fb-4bcb-bd20-24cb98b6d7d7"
     apikey = "zbnqBLYHFy9sQAfOwfFs2oy6KNDXj90j_TBQZrdIsjTo"
     params = {
         "text": text,
-        "version": "2021-09-01",
+        "version": "2022-04-07",
         "features": "sentiment",
         "return_analyzed_text": True
     }
@@ -130,7 +132,6 @@ def analyze_review_sentiments(dealerreview):
     response = requests.get(
         url,
         params=params,
-        headers=headers,
         auth=HTTPBasicAuth('apikey', api_key)
     )
 
