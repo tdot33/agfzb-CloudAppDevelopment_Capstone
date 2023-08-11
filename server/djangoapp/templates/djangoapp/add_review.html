@@ -11,6 +11,58 @@
 
 </head>
     <body>
+        <nav class="navbar navbar-light bg-light">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand font-weight-bold font-italic text-danger" href="{% url 'djangoapp:index' %}">Best Cars Dealership</a>
+                </div>
+                <ul class="navbar-nav ml-auto">
+                    {% if user.is_authenticated %}
+                    <li>
+                        <a class="btn btn-link" href="{% url 'djangoapp:about' %}">About</a>
+                        <a class="btn btn-link" href="{% url 'djangoapp:add_review' dealer_id=dealer_id%}">Add Review</a>
+                        <a class="btn btn-link" href="{% url 'djangoapp:dealer_details' dealer_id=dealer_id%}">Dealer Review</a>
+                        <a class="btn btn-link" href="{% url 'djangoapp:contact' %}">Contact Us</a>
+                        <a class="btn btn-link" href="#">{{ user.first_name }}({{ user.username }})</a>
+                        <a class="btn btn-link" href="{% url 'djangoapp:logout' %}">Logout</a>
+                    </li>
+                    {% else %}
+                    <li>
+                        <form class="form-inline" action="{% url 'djangoapp:login' %}" method="post">
+                            {% csrf_token %}
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Username" name="username" >
+                                <input type="password" class="form-control" placeholder="Password" name="psw" >
+                                <button class="btn btn-primary" type="submit">Login</button>
+                                <a class="btn btn-link" href="{% url 'djangoapp:registration' %}">Sign Up</a>
+                            </div>
+                        </form>
+                    </li>
+                    {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </nav>
         <form action="{% url 'djangoapp:add_review' dealer_id %}" method="post">
+        <div class="container">
+            <h1>Add a Review</h1>
+            <label for="car"><b>Choose your car</b></label>
+            <select name="car" id="car" class="form-select" required>
+                {% for car in cars %}
+                    <option {% if car.id == selected_car_id %}selected{% endif %} value="{{ car.id }}">{{ car.name }}-{{ car.make.name }}-{{ car.year|date:"Y" }}</option>
+                {% endfor %}
+            </select>            
+            <label for="purchasecheck"><b>Did you purchase this car?</b></label>
+            <input class="form-check-input" type="checkbox" name="purchasecheck" id="purchasecheck">
+            <label for="purchasedate"><b>When did you purchase your car?</b></label>
+            <input class="date-own form-control" type="text" name="purchasedate" id="purchasedate">
+            <label for="content"><b>Write your review</b></label>
+            <textarea class="form-control" id="content" name="content" rows="2" required></textarea>
+            <button class="btn btn-primary" type="submit" href="{% url 'djangoapp:add_review' %}">Submit Review</button>      
     </body>
+    <script type="text/javascript">
+        $('.date-own').datepicker({
+           format: 'mm/dd/yyyy'
+         });
+   </script>
 </html>
