@@ -15,7 +15,7 @@
 <body>
 <header>
     <h1 class="text-center mt-auto">
-    This is the index page of your Django app!
+    Dealerships
     </h1>
     <nav class="navbar navbar-light bg-light">
         <div class="container-fluid">
@@ -48,7 +48,30 @@
         </div>
     </nav>
 </header>
-    <!--Add a dealer table here -->
+<table class="table" id="table">
+    <thead>
+        <tr>
+            <th data-field="id">ID</th>
+            <th data-field="name">Name</th>
+            <th data-field="city">City</th>
+            <th data-field="address">Address</th>
+            <th data-field="zip">Zip</th>
+            <th data-field="state">State</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for dealer in dealerships %}
+            <tr>
+                <td>{{dealer.id}}</td>
+                <td><a href="{% url 'djangoapp:dealer_details' dealer.id %}">{{dealer.full_name}}</a></td>
+                <td>{{dealer.city}}</td>
+                <td>{{dealer.address}}</td>
+                <td>{{dealer.zip}}</td>
+                <td>{{dealer.state}}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 </body>
 
