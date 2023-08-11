@@ -11,6 +11,7 @@ from .models import CarDealer
 from requests.auth import HTTPBasicAuth
 
 def get_request(url, api_key=None, params=None, **kwargs):
+    print(kwargs)
     print("GET from {} ".format(url))
     try:
         headers = {'Content-Type': 'application/json'}
@@ -103,28 +104,33 @@ def get_dealer_by_id_from_cf(url, dealerId):
 
 # Create a get_dealer_reviews_from_cf method to get reviews by dealer id from a cloud function
 
-def get_dealer_reviews_from_cf(url, dealerId):
-    results = []
-    json_result = get_request(url, dealerId=dealerId)
+def get_all_reviews_from_cf(url):
+    json_result = get_request(url)
     if json_result:
         reviews = json_result["documents"]
-        print(json_result)
-        # Create DealerReview object with values from the reviews dict
-        for review in reviews:
-            review_obj = DealerReview(
-                name=review["name"],
-                dealership=review["dealership"],
-                purchase=review["purchase"],
-                purchase_date=review["purchase_date"],
-                car_make=review["car_make"],
-                car_model=review["car_model"],
-                car_year=review["car_year"],
-                review=review["review"],
-                id=review["id"]          
-            )
-            review_obj.sentiment = analyze_review_sentiments(review_obj.review)
-            results.append(review_obj)
+        return reviews
+    return []
 
+def get_dealer_reviews_from_cf(url, dealerId):
+    reviews = get_all_reviews_from_cf(url)
+    filtered_reviews = [review for review in reviews if review["dealership"] == dealerId]
+    results = []
+    for review in filtered_reviews:
+        sentiment = analyze_review_sentiments(review["review"])  # Calculate sentiment
+        review_obj = DealerReview(
+            name=review["name"],
+            dealership=review["dealership"],
+            purchase=review["purchase"],
+            purchase_date=review.get("purchase_date", ""),  # Use .get() to handle missing key
+            car_make=review.get("car_make", ""),
+            car_model=review.get("car_model", ""),
+            car_year=review.get("car_year", ""),
+            review=review["review"],
+            sentiment=sentiment,  # Set sentiment directly
+            id=review["id"]          
+        )
+        results.append(review_obj)
+    
     return results
 
 # Create an `analyze_review_sentiments` method to call Watson NLU and analyze text
@@ -137,7 +143,7 @@ def analyze_review_sentiments(text, api_key=None):
         "text": text,
         "version": "2022-04-07",
         "features": "sentiment",
-        "return_analyzed_text": True
+        "return_analyzed_text": False
     }
     
     response = requests.get(
@@ -147,13 +153,12 @@ def analyze_review_sentiments(text, api_key=None):
     )
 
     if response.status_code == 200:
-        sentiment = response.json()["sentiment"]["document"]["label"]
+        sentiment = response.json()["label"]
         return sentiment
     else:
         print("Sentiment analysis failed with status code:", response.status_code)
 
     return None
-    # - Get the returned sentiment label such as Positive or Negative
 
 
 

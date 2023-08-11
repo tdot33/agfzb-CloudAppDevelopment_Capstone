@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
-from .models import CarMake, CarModel
+from .models import CarMake, CarModel, CarDealer, DealerReview
 from .restapis import get_dealers_from_cf, get_dealer_by_id_from_cf, get_dealer_reviews_from_cf, post_request
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -22,8 +22,6 @@ logger = logging.getLogger(__name__)
 def about(request):
     if request.method == 'GET':
         return render(request, 'djangoapp/about.html')
-# ...
-
 
 # Create a `contact` view to return a static contact page
 def contact(request):
@@ -112,12 +110,11 @@ def get_dealerships(request):
 def get_dealer_details(request, dealer_id):
     context = {}
     if request.method == "GET":
-        url = "https://us-south.functions.appdomain.cloud/api/v1/web/4737848c-a6ec-49f3-88fd-9167ca9b806b/dealership-package/get-review"
+        url = "https://us-south.functions.appdomain.cloud/api/v1/web/4737848c-a6ec-49f3-88fd-9167ca9b806b/dealership-package/get-review.json"
         # Get reviews from the URL
         reviews = get_dealer_reviews_from_cf(url, dealerId=dealer_id)
-        
-        context = {"reviews": reviews}
-        
+        context = {"reviews": reviews, "dealer_id": dealer_id}
+        print(context)
         # Construct a string with reviewer names and sentiments
         review_text = ""
         for review in reviews:

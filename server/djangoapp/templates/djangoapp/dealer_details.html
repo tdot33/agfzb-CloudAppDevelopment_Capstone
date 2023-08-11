@@ -17,8 +17,8 @@
                     {% if user.is_authenticated %}
                     <li>
                         <a class="btn btn-link" href="{% url 'djangoapp:about' %}">About</a>
-                        <a class="btn btn-link" href="{% url 'djangoapp:dealer_details%}">Dealer Details</a>
                         <a class="btn btn-link" href="{% url 'djangoapp:contact' %}">Contact Us</a>
+                        <a class="btn btn-link" href="{% url 'djangoapp:dealer_details' dealer_id=dealer_id%}">Dealer Review</a>
                         <a class="btn btn-link" href="#">{{ user.first_name }}({{ user.username }})</a>
                         <a class="btn btn-link" href="{% url 'djangoapp:logout' %}">Logout</a>
                     </li>
@@ -39,9 +39,23 @@
                 </ul>
             </div>
         </nav>
-
-    <!-- Add reviews as cards -->
-
+    <div class="card-columns">
+        {% for review in reviews %}
+            <div class="card">
+                {% if review.sentiment == "positive" %}
+                    <img class="card-img-left" src="{{MEDIA_URL}}/emoji/positive.png">
+                {% elif review.sentiment == "negative" %}
+                    <img class="card-img-left" src="{{MEDIA_URL}}/emoji/negativeg">
+                {% else %}
+                    <img class="card-img-left" src="{{MEDIA_URL}}/emoji/neutral.png">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ review.car_model }} - {{ review.car_make }} ({{ review.car_year }})</h5>
+                    <p class="card-text">{{ review.review }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
     </body>
-
 </html>
