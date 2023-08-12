@@ -126,18 +126,30 @@ def get_dealer_details(request, dealer_id):
 # Create a `add_review` view to submit a review
 @login_required
 def add_review(request, dealer_id):
-    if request.method == "POST":
-        name = request.POST['name']
-        dealership = request.POST['dealership']
-        review_text = request.POST['review']
-        purchase = request.POST['purchase']
-        
+    if request.method == "GET":
+        cars = CarModel.objects.filter(dealer_id=dealer_id)
+        context = {"cars": cars, "dealer_id": dealer_id}
+        return render(request, 'djangoapp/add_review.html', context)
+    elif request.method == "POST":
+        dealership = dealer_id
+        name = request.POST.get('full_name')
+        car_make = request.POST.get('car.car_make')
+        car_model = request.POST.get('car.name')
+        car_year = request.POST.get('car.year')
+        review_text = request.POST.get('review_text')
+        purchase = request.POST.get('purchase')
+        purchase_date_str = request.POST.get('purchase_date')
+        purchase_date = datetime.strptime(purchase_date_str, '%Y-%m-%d')
         review = {
             "time": datetime.utcnow().isoformat(),
             "name": name,
+            "car_make": car_make,
+            "car_model": car_model,
+            "car_year": car_year,
             "dealership": dealership,
             "review": review_text,
-            "purchase": purchase
+            "purchase": purchase,
+            "purchase_date": purchase_date
         }
 
         json_payload = {

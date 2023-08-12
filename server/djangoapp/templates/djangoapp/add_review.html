@@ -5,9 +5,10 @@
     {% load static %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.js"></script>
 
 </head>
     <body>
@@ -39,30 +40,37 @@
                         </form>
                     </li>
                     {% endif %}
-                    </li>
                 </ul>
             </div>
         </nav>
-        <form action="{% url 'djangoapp:add_review' dealer_id %}" method="post">
-        <div class="container">
-            <h1>Add a Review</h1>
+        <form action="{% url 'djangoapp:add_review' dealer_id %}" method="post" class="container">
+            {% csrf_token %}
+            <h1 class="mb-4">Add a Review</h1>
+            <input type="hidden" name="full_name" value="{{ user.first_name }} {{ user.last_name }}">
+            
             <label for="car"><b>Choose your car</b></label>
-            <select name="car" id="car" class="form-select" required>
+            <select name="car" id="car" class="form-select mb-3" required>
                 {% for car in cars %}
-                    <option {% if car.id == selected_car_id %}selected{% endif %} value="{{ car.id }}">{{ car.name }}-{{ car.make.name }}-{{ car.year|date:"Y" }}</option>
+                    <option {% if car.id == selected_car_id %}selected{% endif %} value="{{ car.id }}">{{ car.year|date:"Y" }} {{ car.car_make.name }} {{ car.name }}</option>
                 {% endfor %}
-            </select>            
-            <label for="purchasecheck"><b>Did you purchase this car?</b></label>
-            <input class="form-check-input" type="checkbox" name="purchasecheck" id="purchasecheck">
-            <label for="purchasedate"><b>When did you purchase your car?</b></label>
-            <input class="date-own form-control" type="text" name="purchasedate" id="purchasedate">
-            <label for="content"><b>Write your review</b></label>
-            <textarea class="form-control" id="content" name="content" rows="2" required></textarea>
-            <button class="btn btn-primary" type="submit" href="{% url 'djangoapp:add_review' %}">Submit Review</button>      
+            </select>
+            
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" name="purchase" id="purchase">
+                <label class="form-check-label" for="purchase"><b>Did you purchase this car?</b></label>
+            </div>
+            
+            <div class="form-group">
+                <label for="purchase_date"><b>When did you purchase your car?</b></label>
+                <input type="date" class="form-control" name="purchase_date" id="purchase_date"/>
+            </div>
+            
+            <div class="mb-3">
+                <label for="content"><b>Write your review</b></label>
+                <textarea class="form-control" id="review_text" name="review_text" rows="2" required></textarea>
+            </div>
+            
+            <button class="btn btn-primary" type="submit">Submit Review</button>
+        </form>
     </body>
-    <script type="text/javascript">
-        $('.date-own').datepicker({
-           format: 'mm/dd/yyyy'
-         });
-   </script>
-</html>
+    </html>
