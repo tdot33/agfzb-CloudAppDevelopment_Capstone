@@ -140,7 +140,10 @@ def add_review(request, dealer_id):
         purchase = request.POST.get('purchase')
         purchase_date_str = request.POST.get('purchase_date')
         purchase_date = datetime.strptime(purchase_date_str, '%Y-%m-%d')
-        review = {
+        url = "https://us-south.functions.appdomain.cloud/api/v1/web/4737848c-a6ec-49f3-88fd-9167ca9b806b/dealership-package/get-review.json"
+        review_id = len(get_all_reviews_from_cf(url)) + 1
+        reviewrevi
+            "id": review_id,ew = {
             "time": datetime.utcnow().isoformat(),
             "name": name,
             "car_make": car_make,
@@ -156,6 +159,6 @@ def add_review(request, dealer_id):
             "review": review
         }
         url = "https://us-south.functions.appdomain.cloud/api/v1/web/4737848c-a6ec-49f3-88fd-9167ca9b806b/dealership-package/post-review"
-        submit_review = post_request(url, json_payload, dealerId=dealer_id)
+        submit_review = post_request(url, json_payload=json_payload, dealerId=dealer_id)
 
         return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
