@@ -1,7 +1,11 @@
 import requests
 import json
-from .models import CarDealer
+from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
+from ibm_watson import NaturalLanguageUnderstandingV1
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+from ibm_watson.natural_language_understanding_v1 \ 
+    import Features, EntitiesOptions, KeywordsOptions
 
 def get_request(url, api_key=None, params=None, **kwargs):
     print(kwargs)
@@ -109,7 +113,10 @@ def get_dealer_reviews_from_cf(url, dealerId):
     filtered_reviews = [review for review in reviews if review["dealership"] == dealerId]
     results = []
     for review in filtered_reviews:
-        sentiment = analyze_review_sentiments(review["review"])  # Calculate sentiment
+        review_sentiment = {
+            "text": review["review"]
+        }
+        sentiment = analyze_review_sentiments(review_sentiment)  # Calculate sentiment
         review_obj = DealerReview(
             name=review["name"],
             dealership=review["dealership"],
@@ -119,7 +126,7 @@ def get_dealer_reviews_from_cf(url, dealerId):
             car_model=review.get("car_model", ""),
             car_year=review.get("car_year", ""),
             review=review["review"],
-            sentiment=sentiment,  # Set sentiment directly
+            sentiment=sentiment["sentiment"],  # Set sentiment directly
             id=review["id"]          
         )
         results.append(review_obj)
@@ -127,31 +134,31 @@ def get_dealer_reviews_from_cf(url, dealerId):
     return results
 
 # Create an `analyze_review_sentiments` method to call Watson NLU and analyze text
-def analyze_review_sentiments(text, api_key=None):
-    results = []
-    # - Call get_request() with specified arguments
-    url = "https://api.au-syd.natural-language-understanding.watson.cloud.ibm.com/instances/ecbd1545-b8fb-4bcb-bd20-24cb98b6d7d7"
-    apikey = "zbnqBLYHFy9sQAfOwfFs2oy6KNDXj90j_TBQZrdIsjTo"
-    params = {
-        "text": text,
-        "version": "2022-04-07",
-        "features": "sentiment",
-        "return_analyzed_text": False
-    }
-    
-    response = requests.get(
-        url,
-        params=params,
-        auth=HTTPBasicAuth('apikey', api_key)
+def analyze_review_sentiments(text):
+    authenticator = IAMAuthenticator('zbnqBLYHFy9sQAfOwfFs2oy6KNDXj90j_TBQZrdIsjTo')
+    natural_language_understanding = NaturalLanguageUnderstandingV1(
+        version='2022-08-10',
+        authenticator=authenticator
     )
+    natural_language_understanding.set_service_url('https://api.au-syd.natural-language-understanding.watson.cloud.ibm.com')
 
-    if response.status_code == 200:
-        sentiment = response.json()["label"]
-        return sentiment
-    else:
-        print("Sentiment analysis failed with status code:", response.status_code)
+    try:
+        analyze_params = {
+            'text': text['text'],
+            'features': {
+                'sentiment': {
+                    'document': True
+                }
+            }
+        }
 
-    return None
+        analysis_results = natural_language_understanding.analyze(**analyze_params).get_result()
+        sentiment_label = analysis_results['sentiment']['document']['label']
 
+        response = {
+            'sentiment': sentiment_label
+        }
 
-
+        return response
+    except Exception as error:
+        print('Error:', error)

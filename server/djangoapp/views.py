@@ -142,8 +142,8 @@ def add_review(request, dealer_id):
         purchase_date = datetime.strptime(purchase_date_str, '%Y-%m-%d')
         url = "https://us-south.functions.appdomain.cloud/api/v1/web/4737848c-a6ec-49f3-88fd-9167ca9b806b/dealership-package/get-review.json"
         review_id = len(get_all_reviews_from_cf(url)) + 1
-        reviewrevi
-            "id": review_id,ew = {
+        review = {
+            "id": review_id,
             "time": datetime.utcnow().isoformat(),
             "name": name,
             "car_make": car_make,
