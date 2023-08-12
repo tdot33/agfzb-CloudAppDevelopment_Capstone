@@ -4,8 +4,7 @@ from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
 from ibm_watson import NaturalLanguageUnderstandingV1
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
-from ibm_watson.natural_language_understanding_v1 \ 
-    import Features, EntitiesOptions, KeywordsOptions
+from ibm_watson.natural_language_understanding_v1 import Features, EntitiesOptions, KeywordsOptions
 
 def get_request(url, api_key=None, params=None, **kwargs):
     print(kwargs)
@@ -116,7 +115,9 @@ def get_dealer_reviews_from_cf(url, dealerId):
         review_sentiment = {
             "text": review["review"]
         }
-        sentiment = analyze_review_sentiments(review_sentiment)  # Calculate sentiment
+        print(review_sentiment)
+        sentiment = analyze_review_sentiments(review_sentiment)
+        print(sentiment)  # Calculate sentiment
         review_obj = DealerReview(
             name=review["name"],
             dealership=review["dealership"],

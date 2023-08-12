@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import CarMake, CarModel, CarDealer, DealerReview
-from .restapis import get_dealers_from_cf, get_dealer_by_id_from_cf, get_dealer_reviews_from_cf, post_request
+from .restapis import get_dealers_from_cf, get_dealer_by_id_from_cf, get_dealer_reviews_from_cf, post_request, get_all_reviews_from_cf
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -14,9 +14,7 @@ import json
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
-
 # Create your views here.
-
 
 # Create an `about` view to render a static about page
 def about(request):
@@ -114,7 +112,6 @@ def get_dealer_details(request, dealer_id):
         # Get reviews from the URL
         reviews = get_dealer_reviews_from_cf(url, dealerId=dealer_id)
         context = {"reviews": reviews, "dealer_id": dealer_id}
-        print(context)
         # Construct a string with reviewer names and sentiments
         review_text = ""
         for review in reviews:
@@ -158,7 +155,7 @@ def add_review(request, dealer_id):
         json_payload = {
             "review": review
         }
-        url = "https://us-south.functions.appdomain.cloud/api/v1/web/4737848c-a6ec-49f3-88fd-9167ca9b806b/dealership-package/post-review"
-        submit_review = post_request(url, json_payload=json_payload, dealerId=dealer_id)
+        post_url = "https://us-south.functions.appdomain.cloud/api/v1/web/4737848c-a6ec-49f3-88fd-9167ca9b806b/dealership-package/post-review"
+        submit_review = post_request(url=post_url, json_payload=json_payload, dealerId=dealer_id)
 
         return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
